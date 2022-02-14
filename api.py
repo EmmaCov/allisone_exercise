@@ -3,40 +3,84 @@ import numpy as np
 import pandas as pd
 
 from fastapi import FastAPI
-from main import DiamondModel, Diamond, DiamondCut, DiamondColor, DiamondClarity, DiamondPolish, DiamondSymmetry, DiamondReport
+
+import main 
+import characteristics as chara
+import preprocess as prep
 
 from sklearn.preprocessing import LabelEncoder
 
 # Create app and model objects
 app = FastAPI()
-model = DiamondModel()
+model = main.DiamondModel()
 
-# Expose the prediction functionality, make a prediction from the passed
-# JSON data and return the predicted wine category with the confidence
 @app.post("/test")
 def index():
-    return{'Nothing to see here'}
+    """
+    Basic function that tells if the app works fine or not
+    """
+    return{'Sanity check'}
 
-@app.get("/parameters")
-def parameters(carat_weight: float, cut: DiamondCut, color: DiamondColor,
-                clarity: DiamondClarity, polish: DiamondPolish,
-                symmetry: DiamondSymmetry, report: DiamondReport):
+@app.get("/prediction")
+def prediction(carat_weight: float,
+               cut: chara.DiamondCut,
+               color: chara.DiamondColor,
+               clarity: chara.DiamondClarity,
+               polish: chara.DiamondPolish,
+               symmetry: chara.DiamondSymmetry,
+               report: chara.DiamondReport):
+    """
+        Function that predicts the diamond object
 
-    diamond = Diamond(carat_weight=carat_weight, cut=cut, color=color,
-                        clarity=clarity, polish=polish, 
-                        symmetry=symmetry, report=report)
+         Parameters
+        ----------
+        carat_weight : float
+            The carat weight of the gem
+        cut : characteristics.DiamondCut
+            The cut of the gem
+        color : characteristics.DiamondColor
+            The color of the gem
+        clarity : characteristics.DiamondClarity
+            The clarity of the gem
+        polish : characteristics.DiamondPolish
+            The polish of the gem
+        symmetry : characteristics.DiamondSymmetry
+            The symmetry of the gem
+        report : characteristics.DiamondReport
+            The report of the gem
 
+        Attributes
+        ----------
+        data : numpy narray
+            The array of the data
+        
+        Returns
+        -------
+        prediction : float
+            The predicted price of the diamond
+    """
+    # Function that predicts the price of a diamond according to its
+    # characteristics
+
+    # Create Diamond object
+    diamond = main.Diamond(carat_weight=carat_weight,
+                            cut=cut, 
+                            color=color,
+                            clarity=clarity,
+                            polish=polish,
+                            symmetry=symmetry, 
+                            report=report)
+
+    # Get the values of the diamond object
     values = list(dict(diamond).values())
 
-    for i in range(1, len(values)):
-        values[i] = values[i].value
-        enc = LabelEncoder()
-        enc.fit(model.df.iloc[:,i])
-        values[i] = list(enc.classes_).index(values[i])
+    # Transform categorical values into numerical ones
+    values = prep.preprocess(values)
 
-    print(values)
-    values = np.array(values).reshape((1, -1))
+    # Reshape the value array
+    values = values.reshape((1, -1))
     
+    # Apply the predict function of the trained model
     prediction = float(model.predict_diamond(values))
 
     return {'prediction': prediction}
