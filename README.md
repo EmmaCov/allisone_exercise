@@ -6,7 +6,7 @@ Diamonds are formed deep within the Earth about 100 miles or so below the surfac
 
 Diamonds are rare because of the incredibly powerful forces needed to create them and therefore they are considered to be very costly.
 
-The goal of this project is to do a regression on diamond prices. To do that we will present the dataset we will use, and then present the methods used and their results.
+The goal of this project is to do a regression on diamond prices using an API.
 
 ## *Required librairies*
 
