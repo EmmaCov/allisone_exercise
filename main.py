@@ -5,106 +5,137 @@ import pandas as pd
 from joblib import dump
 from pydantic import BaseModel
 
-from enum import Enum
+import characteristics
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
 
-class DiamondCut(str, Enum):
-    #'Fair', 'Good', 'Very Good', 'Ideal', 'Signature Ideal'
-    signature_ideal = "Signature-Ideal"
-    ideal = "Ideal"
-    very_good = "Very Good"
-    good = "Good"
-    fair = "Fair"
 
-class DiamondColor(str, Enum):
-    #'D' 'E' 'F' 'G' 'H' 'I'
-    d = "D"
-    e = "E"
-    f = "F"
-    g = "G"
-    h = "H"
-    i = "I"
-
-class DiamondClarity(str, Enum):
-    #'SI1', 'VS1', 'VS2', 'VVS2', 'VVS1', 'IF', 'FL'
-    flawless = "FL"
-    int_flawless = "IF"
-    vvs1 = "VVS1"
-    vvs2 = "VVS2"
-    vs2 = "VS2"
-    vs1 = "VS1"
-    si1 = "SI1"
-
-class DiamondPolish(str, Enum):
-    #'EX' 'G' 'ID' 'VG'
-    ideal = "ID"
-    excellent = "EX"
-    very_good = "VG"
-    good = "G"
-
-
-class DiamondSymmetry(str, Enum):
-    #'EX' 'G' 'ID' 'VG'
-    ideal = "ID"
-    excellent = "EX"
-    very_good = "VG"
-    good = "G"
-    
-
-class DiamondReport(str, Enum):
-    #'AGSL' 'GIA'
-    agsl = "AGSL"
-    gia = "GIA"
-
-
-# Class which describes a diamond
 class Diamond(BaseModel):
-    carat_weight: float
-    cut: DiamondCut
-    color: DiamondColor
-    clarity: DiamondClarity
-    polish: DiamondPolish
-    symmetry: DiamondSymmetry
-    report: DiamondReport
+    """
+    Class that describes a diamond
 
-# Class for training the model and making predictions
+    Attributes
+    ----------
+    carat_weight : float
+        The carat weight of the gem
+    cut : characteristics.DiamondCut
+        The cut of the gem
+    color : characteristics.DiamondColor
+        The color of the gem
+    clarity : characteristics.DiamondClarity
+        The clarity of the gem
+    polish : characteristics.DiamondPolish
+        The polish of the gem
+    symmetry : characteristics.DiamondSymmetry
+        The symmetry of the gem
+    report : characteristics.DiamondReport
+        The report of the gem
+    """
+    carat_weight: float
+    cut: characteristics.DiamondCut
+    color: characteristics.DiamondColor
+    clarity: characteristics.DiamondClarity
+    polish: characteristics.DiamondPolish
+    symmetry: characteristics.DiamondSymmetry
+    report: characteristics.DiamondReport
+
 class DiamondModel:
-    # Class constructor, loads the dataset and loads the model
-    # if exists. If not, calls the _train_model method and
-    # saves the model
+    """
+    Class that preprocesses the data, trains the model
+    and makes predictions
+
+    Attributes
+    ----------
+    df : pandas DataFrame
+        The dataframe of the data
+    model_fname_ : str
+        The name of the model
+    model : joblib model
+        The trained model
+    
+    Methods
+    -------
+    preprocessing(data: narray)
+        Preprocess the categorical data into numerical data
+
+    _train_model()
+        Train the model
+
+    predict_diamond(data: narray)
+        Predict the price of a diamond
+    """
+
     def __init__(self):
+        # Class constructor, loads the dataset and loads the model
+        # if exists. If not, calls the _train_model method and
+        # saves the model
         self.df = pd.read_csv('data/diamond.csv')
         self.model_fname_ = 'diamond_price.pkl'
-        
         try:
             self.model = joblib.load(self.model_fname_)
         except Exception as _:
             self.model = self._train_model()
             dump(self.model, self.model_fname_)
 
-    def _preprocessing(self, X):
+    def preprocessing(self, data):
+        """
+        Method that preprocesses the data
+
+        Attributes
+        ----------
+        data : numpy narray
+            The array of the data
+        
+        Returns
+        -------
+        data : numpy narray
+            The preprocessed data, where categorical values have been
+            converted into numerical ones 
+        """
+
         enc = LabelEncoder()
 
-        for col in X.columns:
-            if X[col].dtype == 'object':
-                X[col] = enc.fit_transform(X[col])
+        for col in data.columns:
+            if data[col].dtype == 'object':
+                data[col] = enc.fit_transform(data[col])
 
-        return X
+        return data
 
-    # Perform model training using the RandomForest regressor
+   
     def _train_model(self):
+        """
+        Method that trains the model
+        
+        Returns
+        -------
+        model : RandomForestRegressor model
+            The model trained on the preprocessed data 
+        """
+        
         X = self.df.drop(['Price'], axis=1)
         y = self.df['Price']
 
-        X = self._preprocessing(X)
+        X = self.preprocessing(X)
         rfc = RandomForestRegressor()
         model = rfc.fit(X, y)
         return model
 
-    # Make a prediction based on the user-entered data
-    # Returns the predicted diamond 
+
     def predict_diamond(self, data):
+        """
+        Method that predicts the price of a diamond
+
+        Attributes
+        ----------
+        data : numpy narray
+            The array of the data
+        
+        Returns
+        -------
+        prediction : float
+            The predicted price of the diamond computed using 
+            the predict method of the model
+        """
         prediction = self.model.predict(data)
         return prediction
