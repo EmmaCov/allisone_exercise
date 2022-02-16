@@ -9,7 +9,9 @@ import characteristics
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split, GridSearchCV
 
+# TODO: units tests
 
 class Diamond(BaseModel):
     """
@@ -57,13 +59,16 @@ class DiamondModel:
     Methods
     -------
     preprocessing(data: narray)
-        Preprocess the categorical data into numerical data
+        Preprocesses the categorical data into numerical data
 
     _train_model()
-        Train the model
+        Trains the model
+
+    score()
+        Computes the score of the model
 
     predict_diamond(data: narray)
-        Predict the price of a diamond
+        Predicts the price of a diamond
     """
 
     def __init__(self):
@@ -102,7 +107,6 @@ class DiamondModel:
 
         return data
 
-   
     def _train_model(self):
         """
         Method that trains the model
@@ -121,6 +125,26 @@ class DiamondModel:
         model = rfc.fit(X, y)
         return model
 
+    def score(self):
+        """
+        Method that compute the score of the model
+
+        Returns
+        -------
+        score : float
+
+        The score of the model
+        """
+        X = self.df.drop(['Price'], axis=1)
+        y = self.df['Price']
+
+        X = self.preprocessing(X)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.15, random_state=42)
+        rfc = RandomForestRegressor()
+        rfc.fit(X_train, y_train)
+
+        score = rfc.score(X_test, y_test)
+        return score
 
     def predict_diamond(self, data):
         """
