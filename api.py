@@ -14,14 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 app = FastAPI()
 model = main.DiamondModel()
 
-@app.post("/test")
-def index():
-    """
-    Basic function that tells if the app works fine or not
-    """
-    return{'Sanity check'}
-
-@app.get("/prediction")
+@app.get("/prediction", tags=["Prediction"])
 def prediction(carat_weight: float,
                cut: chara.DiamondCut,
                color: chara.DiamondColor,
@@ -32,35 +25,43 @@ def prediction(carat_weight: float,
     """
         Function that predicts the diamond object
 
-         Parameters
+        Parameters
         ----------
         carat_weight : float
-            The carat weight of the gem
-        cut : characteristics.DiamondCut
-            The cut of the gem
-        color : characteristics.DiamondColor
-            The color of the gem
-        clarity : characteristics.DiamondClarity
-            The clarity of the gem
-        polish : characteristics.DiamondPolish
-            The polish of the gem
-        symmetry : characteristics.DiamondSymmetry
-            The symmetry of the gem
-        report : characteristics.DiamondReport
-            The report of the gem
 
-        Attributes
-        ----------
-        data : numpy narray
-            The array of the data
+            The carat weight of the gem
+
+        cut : DiamondCut
+
+            The cut of the gem, values can be be "Signature-Ideal", "Ideal","Very Good", "Good", "Fair"
+
+        color : DiamondColor
+
+            The color of the gem, values dan be "D", "E", "F", "G", "H", "I"
+
+        clarity : DiamondClarity
+
+            The clarity of the gem, values can be "FL", "IF", "VVS1", "VVS2", "VS2", "VS1", "SI1"
+
+        polish : DiamondPolish
+
+            The polish of the gem, values can be "ID", "EX", "VG", "G"
+
+        symmetry : DiamondSymmetry
+
+            The symmetry of the gem, values can be "ID", "EX", "VG", "G"
+
+        report : DiamondReport
+
+            The report of the gem, values can be "AGSL", "GIA"
+
         
         Returns
         -------
         prediction : float
+
             The predicted price of the diamond
     """
-    # Function that predicts the price of a diamond according to its
-    # characteristics
 
     # Create Diamond object
     diamond = main.Diamond(carat_weight=carat_weight,
@@ -84,3 +85,28 @@ def prediction(carat_weight: float,
     prediction = float(model.predict_diamond(values))
 
     return {'prediction': prediction}
+
+
+@app.post("/score", tags=['Score'])
+def score():
+    """
+    Function that computes the score of the model
+
+    Returns
+    -------
+
+    score : float
+
+        The score of the model
+    """
+
+    score = float(model.score())
+
+    return{'score': score*100}
+
+@app.post("/test", tags=['Test'])
+def test():
+    """
+    Basic function that tells if the app works fine or not
+    """
+    return{'Sanity check'}
