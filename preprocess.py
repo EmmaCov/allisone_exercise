@@ -15,7 +15,7 @@ def preprocess(data):
 
     Returns
     -------
-    preprocessed_data : numpy narray of integers
+    preprocessed_data : numpy narray of floats
         The preprocessed data
     """
 
