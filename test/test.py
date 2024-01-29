@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 
-import main
-from preprocess import preprocess
+import ML_Coding_exercise.src.main as main
+from ML_Coding_exercise.src.domain.preprocess import preprocess
 
 model = main.DiamondModel()
 

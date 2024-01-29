@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-import main
+import ML_Coding_exercise.src.main as main
 
 def preprocess(data):
     """

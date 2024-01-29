@@ -5,7 +5,7 @@ import pandas as pd
 from joblib import dump
 from pydantic import BaseModel
 
-import characteristics
+import ML_Coding_exercise.src.utils.constant as constant
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestRegressor
@@ -33,12 +33,12 @@ class Diamond(BaseModel):
         The report of the gem
     """
     carat_weight: float
-    cut: characteristics.DiamondCut
-    color: characteristics.DiamondColor
-    clarity: characteristics.DiamondClarity
-    polish: characteristics.DiamondPolish
-    symmetry: characteristics.DiamondSymmetry
-    report: characteristics.DiamondReport
+    cut: constant.DiamondCut
+    color: constant.DiamondColor
+    clarity: constant.DiamondClarity
+    polish: constant.DiamondPolish
+    symmetry: constant.DiamondSymmetry
+    report: constant.DiamondReport
 
 class DiamondModel:
     """

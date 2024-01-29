@@ -1,14 +1,8 @@
-import joblib
-import numpy as np
-import pandas as pd
-
 from fastapi import FastAPI
 
-import main 
-import characteristics as chara
-import preprocess as prep
-
-from sklearn.preprocessing import LabelEncoder
+import allisone_exercise.src.main as main 
+import allisone_exercise.src.utils.constant as chara
+import allisone_exercise.src.domain.preprocess as prep
 
 # Create app and model objects
 app = FastAPI()
@@ -21,7 +15,7 @@ def prediction(carat_weight: float,
                clarity: chara.DiamondClarity,
                polish: chara.DiamondPolish,
                symmetry: chara.DiamondSymmetry,
-               report: chara.DiamondReport):
+               report: chara.DiamondReport) -> dict[str, float]:
     """
         Function that predicts the diamond object
 
@@ -88,7 +82,7 @@ def prediction(carat_weight: float,
 
 
 @app.post("/score", tags=['Score'])
-def score():
+def score() -> dict[str, float]:
     """
     Function that computes the score of the model
 
@@ -102,11 +96,11 @@ def score():
 
     score = float(model.score())
 
-    return{'score': score*100}
+    return {'score': score*100}
 
 @app.post("/test", tags=['Test'])
-def test():
+def test() -> str:
     """
     Basic function that tells if the app works fine or not
     """
-    return{'Sanity check'}
+    return 'Sanity check'
