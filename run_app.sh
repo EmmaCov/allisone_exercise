@@ -1,0 +1,1 @@
+uvicorn src.allisone_exercise.api.app:app --port 8888 --reload
